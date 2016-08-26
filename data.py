@@ -12,17 +12,21 @@ import pandas as pd
 # - Concatenate this extracted array into a 2D matrix with each column repping a feature & each row a subject (DONE, 228436x135 ARRAY RESHAPED TO VECTOR)
 # - Have these two lists feed into current stack of cross validation (IN PROGRESS)
 
-def Groups():
+#Instructions
+# Run with data.Groups('/home/james/Desktop/PAC Data/pac_2016_data_files/')
+# where the file location = data_directory (here, '/home/james/Desktop/PAC Data/pac_2016_data_files/')
+# Returns a dict of 1D arrays and a dict of group labels keyed by subject filename
+
+def Groups(data_directory):
     '''Insert location of data directory in DATA_DIRECTORY'''    
-    
-    DATA_DIRECTORY = '/home/james/Desktop/PAC Data/pac_2016_data_files/' 
-    
+ 
     filedir = DATA_DIRECTORY + '*.mat'
     filenames = glob.glob(filedir)
     hcfiles = [s for s in filenames if 'HC' in s]
     hcfiles.sort()
     mddfiles = [s for s in filenames if 'MDD' in s]
     mddfiles.sort()
+    
     datafiles = hcfiles + mddfiles
 
     dataarrays = {}
@@ -34,10 +38,7 @@ def Groups():
     grouplabels = {}
     for f in datafiles:
         if 'HC' in f: grouplabels[f] = 0
-        if 'MDD' in f: grouplabels[f]= 1
-
-#grouplabels[f] = np.append(np.zeros(len(hcfiles),dtype=np.int8),np.ones(len(mddfiles),dtype=np.int8))
-
+        elif 'MDD' in f: grouplabels[f]= 1
 
     return dataarrays, grouplabels
     
