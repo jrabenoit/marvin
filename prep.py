@@ -45,12 +45,7 @@ def Sort(dir_1, dir_2, n_1, n_2):
     concat_subjects_dict = concat_dict
 
     return concat_dict, concat_subjects_dict, iter_n
-'''
-    dataset_1 = sorted(glob.glob(dir_1))
-    dataset_2 = sorted(glob.glob(dir_2))
-    sorted_files = dataset_1 + dataset_2
-    return concat_files
-'''
+
 
 def MaskFlatten(concat_dict, mask, iter_n):
     '''Mask image data, convert to 2D feature matrix'''
@@ -60,13 +55,7 @@ def MaskFlatten(concat_dict, mask, iter_n):
         masked_dict[i] = nifti_masker.fit_transform(concat_dict[i])
     return masked_dict
 
-def ZNormalize(masked_dict, iter_n):
-    '''Will this work with sparse data? See 4.3.1.2'''
-    stdscaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
-    znorm_dict = {}
-    for i in range(iter_n):
-        znorm_dict[i] = stdscaler.fit_transform(masked_dict[i])
-    return znorm_dict
+
 
 def GroupLabels(n_1, n_2, iter_n):
     '''Create two-class label set matching data input'''

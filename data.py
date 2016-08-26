@@ -1,48 +1,35 @@
 #!/usr/bin/env python 
 
-import os, csv, glob, pprint, random, copy
 import scipy.io as sio
 import numpy as np
 import pandas as pd
+import os, csv, glob, pprint, random, copy
+from sklearn import preprocessing
 
-#Goals:
-# - Generate an ordered list of filenames (DONE)
-# - Create an ordered list of labels (0 or 1 (if file contains HC, let label =0 else =1) (DONE)
-# - Go into the file and extract the 'PAC_data' array for each subject (DONE)
-# - Concatenate this extracted array into a 2D matrix with each column repping a feature & each row a subject (DONE, 228436x135 ARRAY RESHAPED TO VECTOR)
-# - Have these two lists feed into current stack of cross validation (IN PROGRESS)
-
-#Instructions
-# Run with data.Groups('/home/james/Desktop/PAC Data/pac_2016_data_files/')
-# where the file location = data_directory (here, '/home/james/Desktop/PAC Data/pac_2016_data_files/')
-# Returns a dict of 1D arrays and a dict of group labels keyed by subject filename
-
-def Groups(data_directory):
-    '''Insert location of data directory in DATA_DIRECTORY'''    
- 
-    filedir = DATA_DIRECTORY + '*.mat'
-    filenames = glob.glob(filedir)
-    hcfiles = [s for s in filenames if 'HC' in s]
+def Setup(datadirectory): 
+    filenames = datadirectory + '*.mat'
+    sortedfiles = glob.glob(filenames)
+    hcfiles = [s for s in sortedfiles if 'HC' in s]
     hcfiles.sort()
-    mddfiles = [s for s in filenames if 'MDD' in s]
+    mddfiles = [s for s in sortedfiles if 'MDD' in s]
     mddfiles.sort()
     
-    datafiles = hcfiles + mddfiles
+    files = hcfiles + mddfiles
 
-    dataarrays = {}
-    for f in datafiles:
-        df = sio.loadmat(f)
-        df2 = np.reshape(df['PAC_data'],(1,np.product(df['PAC_data'].shape)))
-        dataarrays[f] = df2
-    
-    grouplabels = {}
-    for f in datafiles:
-        if 'HC' in f: grouplabels[f] = 0
-        elif 'MDD' in f: grouplabels[f]= 1
+    vectors = {}
+    for i in files:
+        mat = sio.loadmat(i)
+        matvector = np.reshape(mat['PAC_data'],(1,np.product(mat['PAC_data'].shape)))
+        vectors[i] = matvector
 
-    return dataarrays, grouplabels
-    
-    
+    data = {}
+    zscaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
+    for i in vectors:
+        data[i] = zscaler.fit_transform(vectors[i])
 
+    labels = {}
+    for i in datafiles:
+        if 'HC' in i: labels[i] = 0
+        elif 'MDD' in i: labels[i]= 1
 
-    
+    return data, labels

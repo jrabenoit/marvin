@@ -1,61 +1,42 @@
 #!/usr/bin/env python 
 
-#Data prep modules, processing modules, and result reporting modules
-from collections import defaultdict
 import pprint, itertools
-import data, prep, crossval
-import iterator, comparator
-import bootstrap
-import visualize
+import data,crossval,iterator,comparator,bootstrap,visualize
+from collections import defaultdict
+
+data_directory = '/home/james/Desktop/PAC Data/pac_2016_data_files/'
 
 #Select a group of scans to use 
-print('Step 1/10: Select Two Groups')
-n_1, n_2, dir_1, dir_2= data.Groups()
+print('Step 1: Sort the groups into HC & MDD, assign group labels HC = 0, MDD = 1')
+data, labels= data.Setup(datadirectory)
 
-concatenated_test = defaultdict(list)
-concatenated_train = defaultdict(list)
+print('Step 2: Set Up Outer CV')
+oX_train, oX_test, oy_train, oy_test= crossval.oSkfCv(data, labels)
 
-number_of_iterations = 10
-for i in range(number_of_iterations):
-    print('>>>ITERATION {} OF {}'.format(i+1,number_of_iterations))  
+print('Step 4: Set Up Inner CV')
+iX_train, iX_test, iy_train, iy_test, train_index_inner, test_index_inner = crossval.iSkfCv(oy_train, oX_train, iter_n)
 
-    print('Step 2/10: Sort Data')
-    concat_dict, concat_subjects_dict, iter_n = prep.Sort(dir_1, dir_2, n_1, n_2)
+print('Step 7: Try all featsel/decomp/mltool Combos')
+test_results, param_set_list = iterator.ParameterSets(iX_train, iX_test, iy_train, iy_test, iter_n)
 
-    print('Step 3/10: Flatten 4D Images to 2D Matrices, Z-normalization')
-    masked_dict = prep.MaskFlatten(concat_dict, mask, iter_n)
-    znorm_dict = prep.ZNormalize(masked_dict, iter_n)
+print('Step 8: Pick Best featsel/decomp/mltool Combo')
+fold_index, folds = comparator.PickBest(test_results)
 
-    print('Step 4/10: Label Groups')
-    group_label_dict = prep.GroupLabels(n_1, n_2, iter_n)
+print('Step 9: Run Best Combo on Outer CV Holdout')
+final_train_results, final_test_results, final_train_predictions, final_test_predictions, final_train_labels, final_test_labels = iterator.TestHoldout(oX_train, oX_test, oy_train, oy_test, fold_index, iter_n) 
 
-    print('Step 5/10: Set Up Outer CV')
-    oX_train, oX_test, oy_train, oy_test, train_index_outer, test_index_outer, train_index_files, test_index_files = crossval.oSkfCv(group_label_dict, znorm_dict, iter_n, concat_subjects_dict)
-
-    print('Step 6/10: Set Up Inner CV')
-    iX_train, iX_test, iy_train, iy_test, train_index_inner, test_index_inner = crossval.iSkfCv(oy_train, oX_train, iter_n)
-
-    print('Step 7/10: Try all featsel/decomp/mltool Combos')
-    test_results, param_set_list = iterator.ParameterSets(iX_train, iX_test, iy_train, iy_test, iter_n)
-
-    print('Step 8/10: Pick Best featsel/decomp/mltool Combo')
-    fold_index, folds = comparator.PickBest(test_results)
-
-    print('Step 9/10: Run Best Combo on Outer CV Holdout')
-    final_train_results, final_test_results, final_train_predictions, final_test_predictions, final_train_labels, final_test_labels = iterator.TestHoldout(oX_train, oX_test, oy_train, oy_test, fold_index, iter_n) 
-
-    print('Step 10/10: Print Test vs. Chance Results')
-    final_train_correct, final_test_correct = comparator.PrintFinal(final_train_results, final_test_results, n_1, n_2, final_train_predictions, final_test_predictions, final_train_labels, final_test_labels, iter_n, train_index_files, test_index_files)
+print('Step 10: Print Test vs. Chance Results')
+final_train_correct, final_test_correct = comparator.PrintFinal(final_train_results, final_test_results, n_1, n_2, final_train_predictions, final_test_predictions, final_train_labels, final_test_labels, iter_n, train_index_files, test_index_files)
 
 #Build accuracy profile for each subject
-    subject_results_test, subject_results_train = comparator.SubjectAccuracy(iter_n, final_train_correct, final_test_correct, train_index_files, test_index_files, concat_subjects_dict)
+subject_results_test, subject_results_train = comparator.SubjectAccuracy(iter_n, final_train_correct, final_test_correct, train_index_files, test_index_files, concat_subjects_dict)
 
 #Concatenate classification attempts for each subject
-    for key, value in subject_results_test.items():
-        concatenated_test[key].append(value)
+for key, value in subject_results_test.items():
+    concatenated_test[key].append(value)
 
-    for key, value in subject_results_train.items():
-        concatenated_train[key].append(value)
+for key, value in subject_results_train.items():
+    concatenated_train[key].append(value)
 
 print('>>>CHAINING TRAINING RESULTS TOGETHER')
 concatenated_train_chained = defaultdict(list)
