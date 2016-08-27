@@ -3,33 +3,43 @@
 import scipy.io as sio
 import numpy as np
 import pandas as pd
-import os, csv, glob, pprint, random, copy
+import os, csv, glob, ntpath
 from sklearn import preprocessing
 
-def Setup(datadirectory): 
-    filenames = datadirectory + '*.mat'
-    sortedfiles = glob.glob(filenames)
-    hcfiles = [s for s in sortedfiles if 'HC' in s]
+def Setup(file_directory): 
+    filenames= file_directory + '*.mat'
+    sortedfiles= glob.glob(filenames)
+    hcfiles= [s for s in sortedfiles if 'HC' in s]
     hcfiles.sort()
-    mddfiles = [s for s in sortedfiles if 'MDD' in s]
+    mddfiles= [s for s in sortedfiles if 'MDD' in s]
     mddfiles.sort()
-    
-    files = hcfiles + mddfiles
+    files= hcfiles + mddfiles
 
-    vectors = {}
+    indices = list(range(0,len(files)))
+    subjects= []
     for i in files:
-        mat = sio.loadmat(i)
-        matvector = np.reshape(mat['PAC_data'],(1,np.product(mat['PAC_data'].shape)))
-        vectors[i] = matvector
-
-    data = {}
-    zscaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
+        j= os.path.splitext(i)[0]
+        subjects.append(ntpath.basename(j))
+    labels= []
+    for i in files:
+        if 'HC' in i: labels.append(0)
+        elif 'MDD' in i: labels.append(1)
+    vectors= []
+    for i in files:
+        mat= sio.loadmat(i)
+        matvector= np.reshape(mat['PAC_data'],(1,np.product(\
+                   mat['PAC_data'].shape)))
+        vectors.append(matvector)
+    data= []
+    zscaler= preprocessing.StandardScaler()
     for i in vectors:
-        data[i] = zscaler.fit_transform(vectors[i])
+        zdata = zscaler.fit_transform(vectors[i])
+        data.append(zdata)
 
-    labels = {}
-    for i in datafiles:
-        if 'HC' in i: labels[i] = 0
-        elif 'MDD' in i: labels[i]= 1
+    df= {}
+    df['subjects']= pd.Series(subjects, index= indices)
+    df['labels']= pd.Series(labels, index= indices)
+    df['vectors']= pd.Series(vectors, index= indices)
+    df['data']= pd.Series(data, index= indices)
 
-    return data, labels
+    return df

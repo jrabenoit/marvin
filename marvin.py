@@ -4,17 +4,17 @@ import pprint, itertools
 import data,crossval,iterator,comparator,bootstrap,visualize
 from collections import defaultdict
 
-data_directory = '/home/james/Desktop/PAC Data/pac_2016_data_files/'
+file_directory = '/home/james/Desktop/PAC Data/pac_2016_data_files/'
 
 #Select a group of scans to use 
-print('Step 1: Sort the groups into HC & MDD, assign group labels HC = 0, MDD = 1')
-data, labels= data.Setup(datadirectory)
+print('Step 1: Create dataframe with subject & group identifiers)
+data, labels= data.Setup(file_directory)
 
 print('Step 2: Set Up Outer CV')
-oX_train, oX_test, oy_train, oy_test= crossval.oSkfCv(data, labels)
+oX_train, oX_test, oy_train, oy_test= crossval.oSkfCv(df)
 
-print('Step 4: Set Up Inner CV')
-iX_train, iX_test, iy_train, iy_test, train_index_inner, test_index_inner = crossval.iSkfCv(oy_train, oX_train, iter_n)
+print('Step 4: Set Up Inner CV from Outer CV training set')
+iX_train, iX_test, iy_train, iy_test= crossval.iSkfCv(oX_train, oy_train)
 
 print('Step 7: Try all featsel/decomp/mltool Combos')
 test_results, param_set_list = iterator.ParameterSets(iX_train, iX_test, iy_train, iy_test, iter_n)
