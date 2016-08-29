@@ -1,43 +1,37 @@
 #!/usr/bin/env python 
 
-from collections import defaultdict
-import pprint
-import itertools
 import numpy as np
-import copy
-import featsel, decomp, mltools, results
-import re
+import pprint, itertools, copy, re, inspect
+import features, transform, estimators, results
+import pandas as pd
+from collections import defaultdict
 
-def ParameterSets(iX_train, iX_test, iy_train, iy_test, iter_n):
-#    param_set_list = list(itertools.product(featsel.feat_sel_dict.keys(),decomp.decomp_dict.keys(),mltools.ml_func_dict.keys()))    
-    for j in range(iter_n):    
-        param_set_list = list(mltools.ml_func_dict.keys())
-        train_results = defaultdict(list)
-        test_results = defaultdict(list)
+def ParameterSets(df_inner_cv):    
+    features_set= inspect.getmembers(features, inspect.isfunction)
+    transform_set= inspect.getmembers(transform, inspect.isfunction)
+    estimators_set= inspect.getmembers(estimators, inspect.isfunction)
     
-        for i in range(0,len(param_set_list)):
-            print('  running iterator param set {0}/{1}: {2}'.format(i+1, len(param_set_list), param_set_list[i]))
-            param_set = param_set_list[i]
-#Random forest only, no featsel or decomp
-            lX_train, lX_test= eval("mltools.ml_func_dict['{}'](iX_train[j], iX_test[j], iy_train[j], iy_test[j])".format(param_set))
-            ir_train, ir_test = results.InnerAverages(lX_train, lX_test, param_set)
-            train_results.update(ir_train)
-            test_results.update(ir_test)  
+    combinations= list(itertools.product(features_set, transform_set, estimators_set))
+    print(combinations)
+    return df_inner_cv
+'''    for i in range(len(combinations)):
+        print('  Testing: {}'.format(combinations[i]))
+        feature = x[1] for x in combinations[i]
+        transformer = x[1] for x in combinations[i]
+        estimator = x[1] for x in combinations[i]
+        feature(df_inner_cv)
+        tranformer(df_inner_cv)
+        estimator(df_inner_cv)
+'''    
+
+'''
+        results.InnerAverages(df_inner_cv)
+        train_results.update(ir_train)
+        test_results.update(ir_test)  
     pprint.pprint(train_results)
     pprint.pprint(test_results)
     return test_results, param_set_list
 
-'''
-        fX_train, fX_test, fy_train, fy_test = eval("featsel.feat_sel_dict['{}'](iX_train, iX_test, iy_train, iy_test)".format(param_set[0]))
-        dX_train, dX_test, dy_train, dy_test = eval("decomp.decomp_dict['{}'](fX_train, fX_test, fy_train, fy_test)".format(param_set[1]))
-        lX_train, lX_test= eval("mltools.ml_func_dict['{}'](dX_train, dX_test, dy_train, dy_test)".format(param_set[2]))
-        ir_train, ir_test = results.InnerAverages(lX_train, lX_test, param_set)
-        train_results.update(ir_train)
-        test_results.update(ir_test)          
-'''
-   
-
-   
 def TestHoldout(oX_train, oX_test, oy_train, oy_test, fold_index, iter_n):
     hX_train= copy.copy(oX_train)
     hX_test= copy.copy(oX_test)
@@ -89,7 +83,3 @@ def TestHoldout(oX_train, oX_test, oy_train, oy_test, fold_index, iter_n):
 
     return final_train_results, final_test_results, final_train_predictions, final_test_predictions, final_train_labels, final_test_labels
 '''       
-        fX_train, fX_test, fy_train, fy_test = eval("featsel.feat_sel_dict_final['{}'](hX_train[i], hX_test[i], hy_train[i], hy_test[i])".format(str(param_set[1])))
-        dX_train, dX_test, dy_train, dy_test = eval("decomp.decomp_dict_final['{}'](fX_train, fX_test, fy_train, fy_test)".format(str(param_set[2])))
-        lX_train, lX_test, lX_train_predict, lX_test_predict, ly_train_labels, ly_test_labels = eval("mltools.ml_func_dict_final['{}'](dX_train, dX_test, dy_train, dy_test)".format(str(param_set[3])))
-'''

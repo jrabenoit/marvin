@@ -3,7 +3,7 @@
 from operator import itemgetter
 
 #Gives average accuracy of each param set tested on inner loop data
-def InnerAverages(lX_train, lX_test, param_set):
+def InnerAverages(df_inner_cv):
     ps = str(param_set)
     ir_train = {
     'train_1 '+ps : sum(itemgetter(0,1,2,3,4)(lX_train))*100/5,

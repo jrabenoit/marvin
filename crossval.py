@@ -2,38 +2,55 @@
 
 import pprint, itertools
 import numpy as np
+import pandas as pd
 from collections import defaultdict
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.feature_selection import SelectKBest
 
-def oSkfCv(df):        
-    '''Outer loop 5-fold CV. X = data, y = label'''
-    X = df['data']
-    y = df['labels']
-    oX_train, oX_test, oy_train, oy_test= [], [], [], []    
+def OuterCv(subjects):        
+    X= subjects['data']
+    y= subjects['labels']
 
-    skf = StratifiedKFold(y, n_folds=5)
-    for train_index, test_index in skf:
-        oX_train.append(X[train_index])
-        oX_test.append(X[test_index])
-        oy_train.append(y[train_index])
-        oy_test.append(y[test_index])
-    print('TRAIN:', train_index, 'TEST:', test_index)    
- 
-    return oX_train, oX_test, oy_train, oy_test
+    X_train_outer, X_test_outer, y_train_outer, y_test_outer = [], [], [], []      
+
+    outer = StratifiedKFold(y, n_folds=5)
+    for train_index, test_index in outer:
+        X_train_outer.append(X[train_index])
+        X_test_outer.append(X[test_index])
+        y_train_outer.append(y[train_index])
+        y_test_outer.append(y[test_index])
+
+    content= {'X_train': X_train_outer,
+              'X_test': X_test_outer,
+              'y_train': y_train_outer,
+              'y_test': y_test_outer}
     
-#Do 5-fold CV in inner loop
-def iSkfCv(oX_train, oy_train):
-    '''Set up as a flat structure of 25 lists'''
-    iX_train, iX_test, iy_train, iy_test= [], [], [], []
+    df_outer_cv= pd.DataFrame(content, index= list(range(5)))
 
-    for oX_train_, oy_train_ in zip(oX_train[i], oy_train[i]):
-        iskf = StratifiedKFold(oy_train_, n_folds=5)
-        for train_index, test_index in iskf:      
-            iX_train[i].append(oX_train_[train_index])
-            iX_test[i].append(oX_train_[test_index])
-            iy_train[i].append(oy_train_[train_index])
-            iy_test[i].append(oy_train_[test_index])
-    return iX_train, iX_test, iy_train, iy_test, train_index_inner, test_index_inner
+    return df_outer_cv
+    
+def InnerCv(df_outer_cv):
+    '''Set up as a flat structure of 25 lists'''
+    X= df_outer_cv['X_train']
+    y= df_outer_cv['y_train']
+    
+    X_train_inner, X_test_inner, y_train_inner, y_test_inner = [], [], [], []
+
+    for X_, y_ in zip(X, y): #read as, "for each pair of X and y lists in (X,y)"
+        inner = StratifiedKFold(y_, n_folds=5)
+        for train_index, test_index in inner:      
+            X_train_inner.append(X_[train_index])
+            X_test_inner.append(X_[test_index])
+            y_train_inner.append(y_[train_index])
+            y_test_inner.append(y_[test_index]) 
+
+    content= {'X_train': X_train_inner,
+              'X_test': X_test_inner,
+              'y_train': y_train_inner,
+              'y_test': y_test_inner}
+
+    df_inner_cv= pd.DataFrame(content, index= list(range(25)))
+ 
+    return df_inner_cv
 
     
