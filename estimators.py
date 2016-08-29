@@ -7,10 +7,10 @@ from sklearn import svm, naive_bayes, neighbors, ensemble, linear_model
 # Score tests the fitted model on data.
 
 def GauNaiBay(df_inner_cv):
-    X_train = copy.copy(df_inner_cv['X_train_trans'])
-    X_test = copy.copy(df_inner_cv['X_test_trans'])
-    y_train = copy.copy(df_inner_cv['y_train_trans'])
-    y_test = copy.copy(df_inner_cv['y_test_trans'])
+    X_train = df_inner_cv['X_train_trans']
+    X_test = df_inner_cv['X_test_trans']
+    y_train = df_inner_cv['y_train_trans']
+    y_test = df_inner_cv['y_test_trans']
     
     for i in range(len(X_train)):
         gnb = naive_bayes.GaussianNB()

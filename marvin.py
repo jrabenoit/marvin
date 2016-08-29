@@ -15,7 +15,7 @@ df_outer_cv= crossval.OuterCv(df_subjects)
 df_inner_cv= crossval.InnerCv(df_outer_cv)
 
 print('Step 3: Try all feature manipulation & ML estimator combinations')
-df_inner_cv = iterator.ParameterSets(df_inner_cv)
+df_inner_cv = iterator.TryMLTools(df_inner_cv)
 
 #print('Step 8: Pick Best featsel/decomp/mltool Combo')
 #fold_index, folds = comparator.PickBest(test_results)
