@@ -7,10 +7,10 @@ from collections import defaultdict
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.feature_selection import SelectKBest
 
-def OuterCv(subjects):        
-    X= subjects['data']
-    y= subjects['labels']
-
+def OuterCv(data_dict):        
+    X= np.array(data_dict['data'])
+    y= np.array(data_dict['labels'])
+    
     X_train_outer, X_test_outer, y_train_outer, y_test_outer = [], [], [], []      
 
     outer = StratifiedKFold(y, n_folds=5)
@@ -19,20 +19,18 @@ def OuterCv(subjects):
         X_test_outer.append(X[test_index])
         y_train_outer.append(y[train_index])
         y_test_outer.append(y[test_index])
-
-    content= {'X_train': X_train_outer,
-              'X_test': X_test_outer,
-              'y_train': y_train_outer,
-              'y_test': y_test_outer}
     
-    df_outer_cv= pd.DataFrame(content, index= list(range(5)))
+    outer_cv= {'X_train': X_train_outer,
+               'X_test': X_test_outer,
+               'y_train': y_train_outer,
+               'y_test': y_test_outer}
 
-    return df_outer_cv
+    return outer_cv
     
 def InnerCv(df_outer_cv):
-    '''Set up as a flat structure of 25 lists'''
-    X= df_outer_cv['X_train']
-    y= df_outer_cv['y_train']
+    '''Set up as a flat structure of 25 df '''
+    X= df_outer_cv['X_train_outer']
+    y= df_outer_cv['y_train_outer']
     
     X_train_inner, X_test_inner, y_train_inner, y_test_inner = [], [], [], []
 
@@ -44,13 +42,11 @@ def InnerCv(df_outer_cv):
             y_train_inner.append(y_[train_index])
             y_test_inner.append(y_[test_index]) 
 
-    content= {'X_train': X_train_inner,
-              'X_test': X_test_inner,
-              'y_train': y_train_inner,
-              'y_test': y_test_inner}
-
-    df_inner_cv= pd.DataFrame(content, index= list(range(25)))
- 
-    return df_inner_cv
+    inner_cv= {'X_train': X_train_inner,
+               'X_test': X_test_inner,
+               'y_train': y_train_inner,
+               'y_test': y_test_inner}
+    
+    return inner_cv
 
     

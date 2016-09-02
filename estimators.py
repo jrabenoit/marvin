@@ -6,21 +6,21 @@ from sklearn import svm, naive_bayes, neighbors, ensemble, linear_model
 # .fit fits the model to the dataset in brackets. 
 # Score tests the fitted model on data.
 
-def GauNaiBay(df_inner_cv):
-    X_train = df_inner_cv['X_train_trans']
-    X_test = df_inner_cv['X_test_trans']
-    y_train = df_inner_cv['y_train_trans']
-    y_test = df_inner_cv['y_test_trans']
+def GauNaiBay(inner_cv):
+    X_train = inner_cv['X_train_trans']
+    X_test = inner_cv['X_test_trans']
+    y_train = inner_cv['y_train_trans']
+    y_test = inner_cv['y_test_trans']
     
     for i in range(len(X_train)):
         gnb = naive_bayes.GaussianNB()
         gnb.fit(X_train[i], y_train[i])
-        df_inner_cv['X_train_est_score'][i] = gnb.score(X_train[i], y_train[i])
-        df_inner_cv['X_test_est_score'][i] = gnb.score(X_test[i], y_test[i]) 
-        df_inner_cv['X_train_est_predict']= gnb.predict(X_train[i])
-        df_inner_cv['X_test_predict']= gnb.predict(X_test[i])
+        inner_cv['X_train_score'][i]= gnb.score(X_train[i], y_train[i])
+        inner_cv['X_test_score'][i]= gnb.score(X_test[i], y_test[i]) 
+        inner_cv['X_train_predict'][i]= gnb.predict(X_train[i])
+        inner_cv['X_test_predict'][i]= gnb.predict(X_test[i])
     
-    return df_inner_cv
+    return inner_cv
 
 '''    
 def KNeighbors(X_train, X_test, y_train, y_test):

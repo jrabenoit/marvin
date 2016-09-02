@@ -5,13 +5,13 @@ import copy
 import numpy as np
 
 #Run feature selection. Data here need to be transformed because they'll be used in the ML step.
-def AllFeats(df_inner_cv):
-    df_inner_cv['X_train_feat']= df_inner_cv['X_train']
-    df_inner_cv['X_test_feat']= df_inner_cv['X_test']
-    df_inner_cv['y_train_feat']= df_inner_cv['y_train']
-    df_inner_cv['y_test_feat']= df_inner_cv['y_test']
+def AllFeats(inner_cv):
+    inner_cv['X_train_feat']= inner_cv['X_train']
+    inner_cv['X_test_feat']= inner_cv['X_test']
+    inner_cv['y_train_feat']= inner_cv['y_train']
+    inner_cv['y_test_feat']= inner_cv['y_test']
 
-    return df_inner_cv
+    return inner_cv
 
 '''   
 def SelKBest_base(X_train, X_test, y_train, y_test, k=10):

@@ -3,13 +3,13 @@
 from sklearn import decomposition
 import copy
     
-def NullDecomp(df_inner_cv):
-    df_inner_cv['X_train_trans']= df_inner_cv['X_train_feat']
-    df_inner_cv['X_test_trans']= df_inner_cv['X_test_feat']
-    df_inner_cv['y_train_trans']= df_inner_cv['y_train_feat']
-    df_inner_cv['y_test_trans']= df_inner_cv['y_test_feat']
+def NullTransform(inner_cv):
+    inner_cv['X_train_trans']= inner_cv['X_train_feat']
+    inner_cv['X_test_trans']= inner_cv['X_test_feat']
+    inner_cv['y_train_trans']= inner_cv['y_train_feat']
+    inner_cv['y_test_trans']= inner_cv['y_test_feat']
 
-    return df_inner_cv
+    return inner_cv
 
 '''    
 def RPca(iX_train, iX_test, iy_train, iy_test, n_components=3):

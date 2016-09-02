@@ -8,14 +8,14 @@ file_directory = '/home/james/Desktop/PAC Data/test_data'
 
 #Select a group of scans to use 
 print('Step 1: Create dataframe with subject & group identifiers')
-df_subjects= inputs.Setup(file_directory)
+data_dict= inputs.Setup(file_directory)
 
 print('Step 2: Create outer & inner cross-validation sets')
-df_outer_cv= crossval.OuterCv(df_subjects)
-df_inner_cv= crossval.InnerCv(df_outer_cv)
+outer_cv= crossval.OuterCv(data_dict)
+inner_cv= crossval.InnerCv(outer_cv)
 
 print('Step 3: Try all feature manipulation & ML estimator combinations')
-df_inner_cv = iterator.TryMLTools(df_inner_cv)
+inner_cv = iterator.TryMLTools(inner_cv)
 
 #print('Step 8: Pick Best featsel/decomp/mltool Combo')
 #fold_index, folds = comparator.PickBest(test_results)
