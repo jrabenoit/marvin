@@ -4,11 +4,22 @@ import pprint, itertools
 import inputs,crossval,iterator#,comparator,bootstrap,visualize
 from collections import defaultdict
 
-file_directory = '/home/james/Desktop/PAC Data/test_data'
+scans_directory = '/home/james/Desktop/PAC Data/test_data'
 
 #Select a group of scans to use 
-print('Step 1: Create dataframe with subject & group identifiers')
-data_dict= inputs.Setup(file_directory)
+print('Step 1: Create reference dict with scans set up for ML')
+print('1/6')
+data_dict= inputs.DictSetup(scans_directory)
+print('2/6')
+data_dict= inputs.LabelSetup(data_dict)
+print('3/6')
+data_dict= inputs.ScanLoader(data_dict)
+print('4/6')
+data_dict= inputs.Resample(data_dict)
+print('5/6')
+data_dict= inputs.Align(data_dict)
+print('6/6')
+data_dict= inputs.Flatten(data_dict)
 
 print('Step 2: Create outer & inner cross-validation sets')
 outer_cv= crossval.OuterCv(data_dict)
