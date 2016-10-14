@@ -1,16 +1,27 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3 
 
 from sklearn import decomposition
-import copy
+import copy, pickle
     
-def NullTransform(inner_cv):
-    inner_cv['X_train_trans']= inner_cv['X_train_feat']
-    inner_cv['X_test_trans']= inner_cv['X_test_feat']
-    inner_cv['y_train_trans']= inner_cv['y_train_feat']
-    inner_cv['y_test_trans']= inner_cv['y_test_feat']
+def NullTransform():
+    return
 
-    return inner_cv
-
+def FastIca():
+    '''ICA on whole dataset... constrain to each inner loop training set next'''
+    with open('pickles/data_dict.pickle','rb') as f:
+        data_dict=pickle.load(f)
+    
+    ica= {}
+    ica['data']= []
+    #scores= {'train': [], 'test': []}
+    X= data_dict['data']
+    trf= decomposition.FastICA(n_components=2)
+    ica['data'].append(trf.fit_transform(X))        
+    
+    with open('pickles/ica_data.pickle','wb') as f:
+        pickle.dump(ica, f, pickle.HIGHEST_PROTOCOL) 
+    
+    return
 '''    
 def RPca(iX_train, iX_test, iy_train, iy_test, n_components=3):
     dX_train = copy.copy(iX_train)

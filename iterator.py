@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 
 import numpy as np
 import pprint, itertools, copy, re, inspect
@@ -6,20 +6,22 @@ import features, transform, estimators, results
 import pandas as pd
 from collections import defaultdict
 
-def TryMLTools(inner_cv):    
+def TryMLTools():    
     features_set= inspect.getmembers(features, inspect.isfunction)
     transform_set= inspect.getmembers(transform, inspect.isfunction)
     estimators_set= inspect.getmembers(estimators, inspect.isfunction)
     
-    sets= list(itertools.product(features_set, transform_set, estimators_set))
-    for i in range(len(sets)):
-        seti = str(sets[i][0][0] + ', ' + sets[i][1][0] + ', ' + sets[i][2][0])
+    try_sets= list(itertools.product(features_set, transform_set, estimators_set))
+    
+    for i in range(len(try_sets)):
+        this_set= str(sets[i][0][0]+ ', '+ sets[i][1][0]+ ', '+ sets[i][2][0])
         print('Set: {}'.format(seti))
-        inner_cv= sets[i][0][1](inner_cv)
-        inner_cv= sets[i][1][1](inner_cv)
-        inner_cv= sets[i][2][1](inner_cv)
+        inner_cv= sets[i][0][1]()
+        inner_cv= sets[i][1][1]()
+        inner_cv= sets[i][2][1]()
         inner_cv= results.InnerAverages(inner_cv, seti)
-    return inner_cv   
+
+    return   
 
 '''
         results.InnerAverages(df_inner_cv)

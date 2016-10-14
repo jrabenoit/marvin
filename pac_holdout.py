@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 
 import csv, shutil, os, glob, random
 import numpy as np

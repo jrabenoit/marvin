@@ -1,33 +1,22 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 
-import pprint, itertools
+import pprint, itertools, gc, sys, pickle
 import inputs,crossval,iterator#,comparator,bootstrap,visualize
 from collections import defaultdict
 
-scans_directory = '/home/james/Desktop/PAC Data/test_data'
-
 #Select a group of scans to use 
 print('Step 1: Create reference dict with scans set up for ML')
-print('1/6')
-data_dict= inputs.DictSetup(scans_directory)
-print('2/6')
-data_dict= inputs.LabelSetup(data_dict)
-print('3/6')
-data_dict= inputs.ScanLoader(data_dict)
-print('4/6')
-data_dict= inputs.Resample(data_dict)
-print('5/6')
-data_dict= inputs.Align(data_dict)
-print('6/6')
-data_dict= inputs.Flatten(data_dict)
+inputs.SubjectInfo()
+inputs.MassageScans()
 
 print('Step 2: Create outer & inner cross-validation sets')
-outer_cv= crossval.OuterCv(data_dict)
-inner_cv= crossval.InnerCv(outer_cv)
+crossval.OuterCv()
+crossval.InnerCv()
 
+'''
 print('Step 3: Try all feature manipulation & ML estimator combinations')
-inner_cv = iterator.TryMLTools(inner_cv)
-
+iterator.TryMLTools()
+'''
 #print('Step 8: Pick Best featsel/decomp/mltool Combo')
 #fold_index, folds = comparator.PickBest(test_results)
 
