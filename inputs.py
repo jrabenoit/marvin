@@ -28,6 +28,7 @@ def SubjectInfo():
     
     site_tr = {1:2, 2:2.3, 3:2, 4:2.52, 5:2.4, 6:1.25,\
                7:2, 8:2.4, 9:2.5, 10:2, 11:2}
+    
     for i in data_dict['files']:
         data_dict['subjects'].append(ntpath.basename(os.path.splitext(i)[0]))
         if 'HC' in i: data_dict['labels'].append(0)
